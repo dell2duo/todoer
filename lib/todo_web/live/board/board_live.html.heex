@@ -1,0 +1,37 @@
+<div class="p-6 space-y-6 min-h-screen relative">
+  <h1 class="text-3xl font-extrabold">ToDo</h1>
+
+  <button id="show-modal" class="btn" phx-click={show("#create-todo-modal")}>
+    Create new task <.icon name="hero-plus" />
+  </button>
+
+  <section id="board" class="flex gap-3">
+    <.column cards={@cards} state={:todo} />
+    <.column cards={@cards} state={:doing} />
+    <.column cards={@cards} state={:done} />
+  </section>
+
+  <div id="create-todo-modal" class="hidden absolute inset-0 bg-black/50 backdrop-blur-[2px]">
+    <div
+      class="absolute rounded-2xl p-6 drop-shadow-lg border border-neutral bg-base-200 mx-auto max-w-fit left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      phx-click-away={JS.push("clear-form") |> hide("#create-todo-modal")}
+    >
+      <.form id="create-todo-form" for={@form} phx-submit="create-task" phx-change="validate">
+        <.input label="title" field={@form[:title]} type="text" />
+        <.input label="description" field={@form[:description]} type="textarea" />
+        <.button class="relative btn btn-primary w-full mt-2" disabled={!@form.source.valid?}>
+          <span class="hidden absolute right-4 loading loading-infinity loading-md phx-submit-loading:block">
+          </span>
+          Criar tarefa
+        </.button>
+        <div class="h-0.5 bg-base-100 w-full mt-1">
+          <div
+            id="loading-success-bar"
+            class="h-0.5 bg-success w-0 phx-submit-loading:w-full transition-[width] duration-5000"
+          >
+          </div>
+        </div>
+      </.form>
+    </div>
+  </div>
+</div>
