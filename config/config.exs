@@ -52,6 +52,16 @@ config :tailwind,
     cd: Path.expand("..", __DIR__)
   ]
 
+# Configure rabbitmq
+config :todo, Todo.RabbitMQ,
+  queue: "todo_notifications",
+  connection: [
+    username: "guest",
+    password: "guest",
+    host: "localhost",
+    port: 5672
+  ]
+
 # Configure Elixir's Logger
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",

@@ -1,16 +1,17 @@
 defmodule Todo.Cards do
   import Ecto.Query, warn: false
+
   alias Todo.{Repo, Card}
 
   def list_cards do
-    Repo.all(Card)
+    Card
+    |> order_by(asc: :inserted_at)
+    |> Repo.all()
   end
 
   def get_card!(id), do: Repo.get!(Card, id)
 
   def create_card(attrs \\ %{}) do
-    Process.sleep(5000)
-
     %Card{}
     |> Card.changeset(attrs)
     |> Repo.insert()

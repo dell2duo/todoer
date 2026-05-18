@@ -1,10 +1,14 @@
 defmodule TodoWeb.BoardLive do
   require Logger
+  alias TodoWeb.Endpoint
+  alias Todo.MessagePublisher
   use TodoWeb, :live_view
 
   alias Todo.{Card, Cards}
 
   def mount(_params, _session, socket) do
+    Endpoint.subscribe("board")
+
     cards = Cards.list_cards()
 
     {:ok,
@@ -16,6 +20,8 @@ defmodule TodoWeb.BoardLive do
   def handle_event("create-task", %{"card" => card}, socket) do
     case Cards.create_card(card) do
       {:ok, card} ->
+        MessagePublisher.publish_create_card(card)
+
         {:noreply,
          socket |> add_card(card) |> push_event("hide-modal", %{modal: "create-todo-modal"})}
 
@@ -56,6 +62,16 @@ defmodule TodoWeb.BoardLive do
         Logger.error(reason)
         {:noreply, socket}
     end
+  end
+
+  def handle_info(
+        %{event: "created_card", payload: %{"card_title" => card_title}} = _event,
+        socket
+      ) do
+    Logger.info("New message broadcast #{card_title}")
+    # TODO: make flash component for :success
+    socket = put_flash(socket, :info, "Card #{card_title} was created")
+    {:noreply, socket}
   end
 
   defp move_card(socket, card) do
